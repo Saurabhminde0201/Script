@@ -1,0 +1,38 @@
+
+How to creat EC2USER And IAM USER through Command Line.
+
+1)Instance Create Command.
+ aws ec2 run-instances --image-id ami-0b0af3577fe5e3532--count 1 --instance-type t2.micro --key-name redhat2-server-key --security-group-ids sg-0f67a9de3f908c9f7.
+
+2) IAM User Create Command.
+aws iam create-user --user-name Demo-user 
+
+3) Command for terminate instance.
+aws ec2 terminate-instances --instance-ids i-0b27719c1b746bbc6
+
+4) Attach Policy to User Command.
+aws iam attach-user-policy --policy-arn arn:aws:iam::aws:policy/IAMUserChangePassword --user-name Demo-user
+aws iam attach-user-policy --policy-arn arn:aws:iam::aws:policy/AmazonS3FullAccess --user-name Demo-user
+
+5)Attach User in Group Command.
+ aws iam add-user-to-group --user-name Saurabh --group-name Acceleration 
+
+6) Command for to create Group.
+aws iam create-group --group-name Acceleration 
+
+7) Command to attach group Policy.
+aws iam attach-group-policy --policy-arn arn:aws:iam::aws:policy/job-function/SupportUser --group-name Acceleration 
+
+8) Command to Creat Access Key
+aws iam create-access-key --user-name Bob 
+
+
+9) Command to create user passwd and request to reset passwd.
+aws iam create-login-profile --user-name saurabh --password aws@1234 --password-reset-required.
+
+ 
+10)Command to remove user from group.
+aws iam remove-user-from-group --user-name Bob --group-name Admins .
+
+
+

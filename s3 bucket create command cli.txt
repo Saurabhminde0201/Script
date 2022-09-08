@@ -1,0 +1,8 @@
+Command to create bucket through cli mode.
+1) aws s3 ls ( to list out bucket in s3)
+
+2) aws s3 mb s3://bucketname ( to vreate bucket)
+
+3) aws s3 rb s3 ://bucketname ( to remove bucket)
+
+4) aws s3 rm < target> ( to remove bucket)

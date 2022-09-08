@@ -1,0 +1,9 @@
+response = client.describe_instances(
+    Filters=[
+        {
+            'Name': 'imageid',
+            'Values': [
+                '',
+            ]
+        },
+    ],

@@ -1,0 +1,160 @@
+provider "aws" {
+  region = "us-east-1"
+}
+
+################### VPC ####################
+
+resource "aws_vpc" "my-vpc" {
+  cidr_block = "10.0.0.0/16"
+
+  tags = {
+    Name = "production-vpc"
+  }
+}
+
+
+##################### Internet Gateway ####################
+
+resource "aws_internet_gateway" "igw" {
+  vpc_id = aws_vpc.my-vpc.id
+
+  tags = {
+    Name = "My-IGW"
+  }
+}
+
+######################## Subnet #############################
+
+resource "aws_subnet" "subnet-1" {
+  vpc_id     = aws_vpc.my-vpc.id
+  cidr_block = "10.0.1.0/24"
+
+  tags = {
+    Name = "prod-public-subnet"
+  }
+}
+
+
+resource "aws_subnet" "subnet2" {
+  vpc_id     = aws_vpc.my-vpc.id
+  cidr_block = "10.0.2.0/24"
+
+  tags = {
+    Name = "prod-private-subnet"
+  }
+}
+
+
+######################## Route Table ########################
+
+resource "aws_route_table" "rt1" {
+  vpc_id = aws_vpc.my-vpc.id
+
+  route = []
+
+  tags = {
+    Name = "RT1"
+  }
+}
+
+resource "aws_route_table" "rt2" {
+  vpc_id = aws_vpc.my-vpc.id
+
+  route = []
+
+  tags = {
+    Name = "RT1"
+  }
+}
+
+######################### Route #######################
+
+resource "aws_route" "route1" {
+  route_table_id         = aws_route_table.rt1.id
+  destination_cidr_block = "0.0.0.0/0"
+  gateway_id             = aws_internet_gateway.igw.id
+  depends_on             = [aws_route_table.rt1]
+}
+
+resource "aws_route" "route2" {
+  route_table_id         = aws_route_table.rt2.id
+  destination_cidr_block = "0.0.0.0/0"
+  gateway_id             = aws_internet_gateway.igw.id
+  depends_on             = [aws_route_table.rt2]
+}
+
+############################## Subnet Assocation ####################
+
+resource "aws_route_table_association" "prt1" {
+  subnet_id      = aws_subnet.subnet-1.id
+  route_table_id = aws_route_table.rt1.id
+}
+
+
+resource "aws_route_table_association" "prt2" {
+  subnet_id      = aws_subnet.subnet2.id
+  route_table_id = aws_route_table.rt2.id
+}
+
+
+######################## Security Group ##############################
+
+resource "aws_security_group" "allow_all" {
+  name        = "allow_all_traffic"
+  description = "Allow all inbound traffic"
+  vpc_id      = aws_vpc.my-vpc.id
+
+  ingress {
+    description      = "All Traffic"
+    from_port        = 0
+    to_port          = 0
+    protocol         = "-1"
+    cidr_blocks      = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = null
+  }
+
+  egress {
+    from_port        = 0
+    to_port          = 0
+    protocol         = "-1"
+    cidr_blocks      = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = ["::/0"]
+  }
+
+  tags = {
+    Name = "allow_traffic"
+  }
+}
+
+######################## Key pair ######################
+
+resource "aws_key_pair" "terraformkey" {
+  key_name   = "terraform-key"
+  public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQD3F6tyPEFEzV0LX3X8BsXdMsQz1x2cEikKDEY0aIj41qgxMCP/iteneqXSIFZBp5vizPvaoIR3Um9xK7PGoW8giupGn+EPuxIA4cDM4vzOqOkiMPhz5XK0whEjkVzTo4+S0puvDZuwIsdiW9mxhJc7tgBNL0cYlWSYVkz4G/fslNfRPW5mYAM49f4fhtxPb5ok4Q2Lg9dPKVHO/Bgeu5woMc7RY0p1ej6D4CKFE6lymSDJpW0YHX/wqE9+cfEauh7xZcG0q9t2ta6F6fmX0agvpFyZo8aFbXeUBr7osSCJNgvavWbM/06niWrOvYX2xwWdhXmXSrbX8ZbabVohBK41 Msaurabh0201@gmail.com"
+}
+
+######################### Ec2 Instance #####################################
+
+resource "aws_instance" "my-frist-server" {
+  ami             = "ami-05fa00d4c63e32376"
+  instance_type   = "t2.micro"
+  subnet_id       = aws_subnet.subnet-1.id
+ vpc_security_group_ids = [aws_security_group.allow_all.id]
+  key_name        = "terraform-key"
+
+  tags = {
+    Name = "linux-prod-public-server"
+  }
+}
+
+resource "aws_instance" "my-second-server" {
+  ami             = "ami-052efd3df9dad4825"
+  instance_type   = "t2.micro"
+  subnet_id       = aws_subnet.subnet2.id
+ vpc_security_group_ids = [aws_security_group.allow_all.id]
+  key_name        = "terraform-key"
+
+  tags = {
+    Name = "ubuntu-prod-private-server"
+  }
+}

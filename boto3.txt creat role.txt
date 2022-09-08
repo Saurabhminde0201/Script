@@ -1,0 +1,35 @@
+Create Roll and user Through Boto3.
+
+
+import boto3
+
+iam = boto3.resource('iam')
+role = iam.Role('name')
+
+
+response = client.create_role(
+    AssumeRolePolicyDocument='<Stringified-JSON>',
+    Path='/',
+    RoleName='Test-Role',
+)
+
+print(response)
+
+
+
+import boto3
+
+client = boto3.client('iam')
+
+iam = boto3.resource('iam')
+user = iam.User('name')
+response = client.create_user(
+    UserName='Bob',
+)
+
+print(response)
+
+
+
+
+

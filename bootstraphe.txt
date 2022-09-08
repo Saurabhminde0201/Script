@@ -1,0 +1,6 @@
+#!bin/bash
+yum install httpd -y
+systemctl enable httpd 
+mkdir /var/www/html/apache/
+echo "<h1> This is apache Server </h1>"> /var/www/html/apache/index.html
+systemctl start httpd

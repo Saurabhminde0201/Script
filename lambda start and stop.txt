@@ -1,0 +1,24 @@
+
+1) For STop and Start.
+import boto3
+region = 'us-east-1'
+instances = [ 'i-0737c71477692e45c', 'i-09966570641dd88b8']
+ec2 = boto3.client('ec2', region_name=region)
+
+def lambda_handler(event, context):
+    ec2.stop_instances(InstanceIds=instances)
+    print ('stopped your instances: ' + str(instances))
+
+
+2) For Terminate
+import boto3
+region = 'us-east-1'
+instances = [ 'i-0487ea06a62e7ac9f']
+ec2 = boto3.client('ec2', region_name=region)
+
+def lambda_handler(event, context):
+    ec2.terminate_instances(InstanceIds=instances)
+    print (response)
+
+
+
